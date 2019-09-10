@@ -30,6 +30,9 @@ public class MainScript : MonoBehaviour {
 
     string fullPath = "";
     string pathToList = "";
+    string helpOff = "";
+
+    public AudioSource audioPlayer;
 
     // Use this for initialization
     void Start () {
@@ -38,11 +41,21 @@ public class MainScript : MonoBehaviour {
         Debug.Log(userDocumentsPath);
         fullPath = userDocumentsPath + "\\Randomizer";
         pathToList = fullPath + "\\games.txt";
+        helpOff = fullPath + "\\help_off.txt";
 
         // Создаём директорию в документах пользователя, как все приличные приложения
         if (!System.IO.Directory.Exists(fullPath))
         {
             System.IO.Directory.CreateDirectory(fullPath);
+        }
+
+        if (System.IO.File.Exists(helpOff))
+        {
+            helpPanel.gameObject.SetActive(false);
+        }
+        else
+        {
+            System.IO.File.WriteAllText(helpOff, "help off");
         }
 
         // Сохраняем или загружаем список игр, если он уже есть
@@ -113,6 +126,18 @@ public class MainScript : MonoBehaviour {
             }
         }
 
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            if (audioPlayer.isPlaying)
+            {
+                audioPlayer.Stop();
+            }
+            else
+            {
+                audioPlayer.Play();
+            }
+        }
+
         if (Input.GetKeyDown(KeyCode.F1))
         {
             // Выключается список игр
@@ -134,6 +159,8 @@ public class MainScript : MonoBehaviour {
             SaveGames();
         }
 
+
+
         if (Input.GetKeyDown(KeyCode.Space) && isRolled == false && !listGO.activeSelf)
         {
             RollBaraban();
@@ -145,11 +172,70 @@ public class MainScript : MonoBehaviour {
             bVelocity -= decVelocity * Time.deltaTime;
         }
 
-        if (bVelocity < 1.0f)
+        if (bVelocity < 1.0f && isRolled)
         {
             isRolled = false;
+
+            // Здесь нужно дать понять, какой вариант выиграл
+            // Для этого текущий угол барабана делим на 360.
+
+            CalculateWinner();
+
+            //float winner = baraban.rotation.eulerAngles.y / 360.0f;
+            //Debug.Log("Winner : " + winner);
         }
 	}
+
+    void CalculateWinner()
+    {
+        // Z-позиция выигрывшей таблички ближе всего к 0.0, при этом X-позиция положительна
+
+        List<GameObject> winners = new List<GameObject>();
+
+        GameObject[] goList = GameObject.FindGameObjectsWithTag("Game");
+
+        // Отсеиваем тех, кто левее центра барабана
+        for (int i = 0; i < goList.Length; i++)
+        {
+            if (goList[i].transform.position.x > 0)
+            {
+                winners.Add(goList[i]);
+            }
+        }
+
+        List<float> distances = new List<float>();
+
+        for (int i = 0; i < winners.Count; i++)
+        {
+            distances.Add(Mathf.Abs(winners[i].transform.position.z));
+        }
+
+        float minValue = Mathf.Infinity;
+
+        for (int i = 0; i < winners.Count; i++)
+        {
+            if (distances[i] < minValue)
+            {
+                minValue = distances[i];
+            }
+        }
+
+        // Вычисляем, у кого минималка
+        for (int i = 0; i < winners.Count; i++)
+        {
+            if (minValue == distances[i])
+            {
+                // номер i наш победитель
+                winners[i].AddComponent<Blinking>();
+                Debug.Log("winner is " + winners[i].GetComponent<TextMesh>().text + " : minValue = " + minValue);
+
+                for (int j = 0; j < winners.Count; j++)
+                {
+                    Debug.Log("winners[" + j + "] " + winners[j].GetComponent<TextMesh>().text + " : minValue = " + distances[j]);
+                }
+            }
+        }
+    }
 
     void OnApplicationQuit()
     {
@@ -205,7 +291,7 @@ public class MainScript : MonoBehaviour {
 
         go.SetParent(baraban);
 
-        go.localPosition = new Vector3(x, 2.1f, z);
+        go.localPosition = new Vector3(x, 2.01f + n * 0.001f, z);
         //go.localPosition = Vector3.zero + Vector3.up * 2 + Vector3.right * 1.68f;
         //go.Translate(Vector3.up * 2);
         //go.Translate(Vector3.right * 0.68f);
