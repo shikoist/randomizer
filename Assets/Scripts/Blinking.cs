@@ -6,7 +6,7 @@ public class Blinking : MonoBehaviour {
 
     float startTime;
     float rateTime = 0.25f;
-    int n = 120;
+    int n = 90;
 
     bool blink;
 
@@ -44,7 +44,20 @@ public class Blinking : MonoBehaviour {
             {
                 tm.color = Color.red;
                 //rr.materials[0].color = Color.black;
-                GameObject.Destroy(this);
+
+                // Здесь нужно удалить из текста inputField выигравшую игру
+                MainScript ms = GameObject.FindObjectOfType<MainScript>();
+
+                TextMesh tem = this.GetComponent<TextMesh>();
+
+                int findWinnerInList = ms.inputField.text.IndexOf(tem.text);
+                //ms.inputField.text = ms.inputField.text.Remove(findWinnerInList, tem.text.Length + 1);
+                ms.inputField.text = ms.inputField.text.Insert(findWinnerInList, "*");
+
+                ms.OnListChanged();
+                ms.SaveAll();
+
+                GameObject.Destroy(this.gameObject);
             }
         }
 	}

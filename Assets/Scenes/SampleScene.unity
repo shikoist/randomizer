@@ -415,8 +415,8 @@ Light:
   m_Enabled: 1
   serializedVersion: 8
   m_Type: 1
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1
+  m_Color: {r: 1, g: 0.9126755, b: 0.7971698, a: 1}
+  m_Intensity: 0.8
   m_Range: 10
   m_SpotAngle: 30
   m_CookieSize: 10
@@ -911,9 +911,38 @@ Prefab:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2300000, guid: a80a881b3dad2884bbdbe9a1dd7144e9, type: 3}
+      propertyPath: m_DynamicOccludee
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2300000, guid: a80a881b3dad2884bbdbe9a1dd7144e9, type: 3}
+      propertyPath: m_LightProbeUsage
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2300000, guid: a80a881b3dad2884bbdbe9a1dd7144e9, type: 3}
+      propertyPath: m_ReflectionProbeUsage
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2300000, guid: a80a881b3dad2884bbdbe9a1dd7144e9, type: 3}
+      propertyPath: m_CastShadows
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2300000, guid: a80a881b3dad2884bbdbe9a1dd7144e9, type: 3}
+      propertyPath: m_ReceiveShadows
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2300000, guid: a80a881b3dad2884bbdbe9a1dd7144e9, type: 3}
+      propertyPath: m_MotionVectors
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a80a881b3dad2884bbdbe9a1dd7144e9, type: 3}
   m_IsPrefabAsset: 0
+--- !u!4 &1453783753 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 400000, guid: a80a881b3dad2884bbdbe9a1dd7144e9,
+    type: 3}
+  m_PrefabInternal: {fileID: 1453783752}
 --- !u!1 &1618235239
 GameObject:
   m_ObjectHideFlags: 0
@@ -1406,7 +1435,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   listGO: {fileID: 2096962555}
   baraban: {fileID: 687323620}
-  listText: {fileID: 2085828099}
   inputField: {fileID: 2096962557}
   prefabText: {fileID: 4296158838527144, guid: 68b5e03e7857a714583d06581668332d, type: 2}
   isRolled: 0
@@ -1418,6 +1446,12 @@ MonoBehaviour:
   helpPanel: {fileID: 718339191}
   userDocumentsPath: 
   audioPlayer: {fileID: 44947422}
+  floor: {fileID: 1453783753}
+  colorFloor: {r: 0, g: 0.84705883, b: 0, a: 1}
+  startMinVelocity: 100
+  startMaxVelocity: 130
+  decMinVelocity: 4
+  decMaxVelocity: 5
 --- !u!4 &2136929201
 Transform:
   m_ObjectHideFlags: 0

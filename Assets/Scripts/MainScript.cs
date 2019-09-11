@@ -10,7 +10,7 @@ public class MainScript : MonoBehaviour {
 
     public Transform baraban;
 
-    public Text listText;
+    //public Text listText;
     public InputField inputField;
 
     public Transform prefabText;
@@ -30,9 +30,22 @@ public class MainScript : MonoBehaviour {
 
     string fullPath = "";
     string pathToList = "";
-    string helpOff = "";
+    //string helpOff = "";
+    string optionsFile = "";
+    string pathToWinnersList = "";
 
     public AudioSource audioPlayer;
+
+    public Transform floor;
+    public Color colorFloor;
+
+    public float startMinVelocity = 90;
+    public float startMaxVelocity = 120;
+
+    public float decMinVelocity = 4;
+    public float decMaxVelocity = 7;
+
+    string winnersList = "";
 
     // Use this for initialization
     void Start () {
@@ -41,7 +54,9 @@ public class MainScript : MonoBehaviour {
         Debug.Log(userDocumentsPath);
         fullPath = userDocumentsPath + "\\Randomizer";
         pathToList = fullPath + "\\games.txt";
-        helpOff = fullPath + "\\help_off.txt";
+        //helpOff = fullPath + "\\help_off.txt";
+        optionsFile = fullPath + "\\options.ini";
+        pathToWinnersList = fullPath + "\\winners.txt";
 
         // Создаём директорию в документах пользователя, как все приличные приложения
         if (!System.IO.Directory.Exists(fullPath))
@@ -49,27 +64,36 @@ public class MainScript : MonoBehaviour {
             System.IO.Directory.CreateDirectory(fullPath);
         }
 
-        if (System.IO.File.Exists(helpOff))
+        //if (System.IO.File.Exists(helpOff))
+        if (System.IO.File.Exists(optionsFile))
         {
             helpPanel.gameObject.SetActive(false);
         }
-        else
-        {
-            System.IO.File.WriteAllText(helpOff, "help off");
-        }
+        //else
+        //{
+        //    System.IO.File.WriteAllText(helpOff, "help off");
+        //}
 
         // Сохраняем или загружаем список игр, если он уже есть
-        UpdateFileWithGames();
+        CreateOrReadFileGames();
+
+        // Сохраняем или загружаем настройки
+        CreateOrReadFileOptions();
+
+        // Применяем цвет пола
+        Renderer rr = floor.GetComponent<Renderer>();
+        Debug.Log(ToHex(rr.material.color));
+        rr.material.color = colorFloor;
 
         listGO.SetActive(false);
         debugPanel.gameObject.SetActive(false);
 	}
 
-    void UpdateFileWithGames()
+    void CreateOrReadFileGames()
     {
         if (!System.IO.File.Exists(pathToList))
         {
-            System.IO.File.WriteAllText(pathToList, listText.text);
+            System.IO.File.WriteAllText(pathToList, inputField.text);
         }
         else
         {
@@ -82,9 +106,98 @@ public class MainScript : MonoBehaviour {
         OnListChanged();
     }
 
-    void SaveGames()
+    string CurrentOptions()
     {
-        System.IO.File.WriteAllText(pathToList, listText.text);
+        string optionsStr = "colorFloor " + ToHex(colorFloor) + "\n" +
+            "startMinVelocity " + startMinVelocity + "\n" +
+            "startMMaxVelocity " + startMaxVelocity + "\n" + 
+            "decMinVelocity " + decMinVelocity + "\n" +
+            "decMaxVelocity " + decMaxVelocity + "\n";
+        return optionsStr;
+    }
+
+    void CreateOrReadFileOptions()
+    {
+        if (!System.IO.File.Exists(optionsFile))
+        {
+            System.IO.File.WriteAllText(optionsFile, CurrentOptions());
+        }
+        else
+        {
+            string inputText = System.IO.File.ReadAllText(optionsFile);
+            Debug.Log("Options file : " + inputText);
+
+            // Парсится и применяется список настроек
+            string[] strText;
+            // Разбиваем на строки
+            strText = inputText.Split('\n');
+
+            // Первая настройка это цвет пола
+            // Разбиваем на подстроки с переменными
+            string[] strText2 = strText[0].Split(' ');
+
+            Debug.Log("Read color : " + strText2[1]);
+            colorFloor = FromHex(strText2[1]);
+
+            // Чтение минимальной скорости
+            // Вторая величина это число, первое название
+            strText2 = strText[1].Split(' ');
+            startMinVelocity = int.Parse(strText2[1]);
+
+            strText2 = strText[2].Split(' ');
+            startMaxVelocity = int.Parse(strText2[1]);
+
+            strText2 = strText[3].Split(' ');
+            decMinVelocity = int.Parse(strText2[1]);
+
+            strText2 = strText[4].Split(' ');
+            decMaxVelocity = int.Parse(strText2[1]);
+        }
+    }
+
+    private string ToHex(Color clr)
+    {
+        string str = "";
+
+        str += "#";
+        str += (Mathf.CeilToInt(clr.r * 255.0f)).ToString("X2") +
+            (Mathf.CeilToInt(clr.g * 255.0f)).ToString("X2") +
+            (Mathf.CeilToInt(clr.b * 255.0f)).ToString("X2");
+
+        return str;
+    }
+    private Color FromHex(string hex)
+    {
+        if (hex.StartsWith("#"))
+            hex = hex.Substring(1);
+
+        if (hex.Length != 6)
+        {
+            Debug.Log("Color not valid " + hex.Length);
+            return Color.white;
+        }
+
+        int r, g, b;
+        r = int.Parse(hex.Substring(0, 2), System.Globalization.NumberStyles.HexNumber);
+        g = int.Parse(hex.Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
+        b = int.Parse(hex.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
+
+        Debug.Log("FromHex : " + r + " " + g + " " + b);
+
+        Color rtn = new Color(
+             r / 255.0f,
+             g / 255.0f,
+             b / 255.0f);
+
+        Debug.Log(rtn);
+
+        return rtn;
+    }
+
+    public void SaveAll()
+    {
+        System.IO.File.WriteAllText(pathToList, inputField.text);
+        System.IO.File.WriteAllText(optionsFile, CurrentOptions());
     }
 
 	// Update is called once per frame
@@ -156,7 +269,7 @@ public class MainScript : MonoBehaviour {
 
         if (Input.GetKeyDown(KeyCode.F4))
         {
-            SaveGames();
+            SaveAll();
         }
 
 
@@ -227,7 +340,25 @@ public class MainScript : MonoBehaviour {
             {
                 // номер i наш победитель
                 winners[i].AddComponent<Blinking>();
+
+                winnersList += winners[i].GetComponent<TextMesh>().text + " at time " + System.DateTime.Now + "\n";
+
+                System.IO.File.WriteAllText(pathToWinnersList, winnersList);
+
+                //// Вставляем звёздочку перед именем выигравшей карточки
+                //int findWinnerInList = inputField.text.IndexOf(winners[i].GetComponent<TextMesh>().text);
+                //inputField.text = inputField.text.Insert(findWinnerInList, "***");
+                //inputField.text = inputField.text.Insert(findWinnerInList + winners[i].GetComponent<TextMesh>().text.Length + 2, "***");
+                //Debug.Log("findWinner : " + findWinnerInList);
+
+                //// И всё сохраняем.
+                //SaveAll();
+
+                //winners[i].GetComponent<TextMesh>().text = "*" + winners[i].GetComponent<TextMesh>().text;
+                //SaveAll();
+
                 Debug.Log("winner is " + winners[i].GetComponent<TextMesh>().text + " : minValue = " + minValue);
+
 
                 for (int j = 0; j < winners.Count; j++)
                 {
@@ -239,10 +370,10 @@ public class MainScript : MonoBehaviour {
 
     void OnApplicationQuit()
     {
-        SaveGames();
+        SaveAll();
     }
 
-    void OnListChanged()
+    public void OnListChanged()
     {
         // Удаление предыдущих объектов
         ClearGames();
@@ -251,13 +382,13 @@ public class MainScript : MonoBehaviour {
 
         // Парсится список игр
         string[] strText;
-        strText = listText.text.Split('\n');
+        strText = inputField.text.Split('\n');
 
         List<string> fltrGames = new List<string>();
 
         for (int i = 0; i < strText.Length; i++)
         {
-            if (strText[i].Length < 3) continue;
+            if (strText[i].Length < 3 || strText[i][0] == '*') continue;
             fltrGames.Add(strText[i]);
         }
 
@@ -267,6 +398,8 @@ public class MainScript : MonoBehaviour {
             
             GameObject go = CreateGame(fltrGames[i], i, fltrGames.Count);
         }
+
+        baraban.rotation = Quaternion.Euler(0, Random.Range(0.0f, 360.0f), 0.0f);
     }
 
     void ClearGames()
@@ -278,6 +411,7 @@ public class MainScript : MonoBehaviour {
         }
     }
 
+    // Создаём картонку с игрой
     GameObject CreateGame(string strGame, int n, int all)
     {
         Transform go = (Transform)Instantiate(prefabText);
@@ -304,10 +438,10 @@ public class MainScript : MonoBehaviour {
 
     void RollBaraban()
     {
-        randVelocity = Random.Range(70.0f, 100.0f);
+        randVelocity = Random.Range(startMinVelocity, startMaxVelocity);
         bVelocity = randVelocity;
         isRolled = true;
-        decVelocity = Random.Range(1.0f, 2.0f);
+        decVelocity = Random.Range(decMinVelocity, decMaxVelocity);
     }
 
     void UpdateDebug(float bAngle, float bVelocity, float startVelocity, float decVelocity)
