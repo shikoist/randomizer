@@ -22,3 +22,4 @@ SPACE - rolls baraban
 Ctrl+M - music ON/OFF
 Game list saves to [UserName]\Documents\Randomizer\games.txt
 Some options in [UserName]\Documents\Randomizer\options.ini
+
