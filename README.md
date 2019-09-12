@@ -14,12 +14,21 @@ Screenshot:
 ![screen00.jpg](screenshots/screen00.jpg)
 
 Hotkeys:
+
 Ctrl+H - shows\hides help
+
 Ctrl+L - shows\hides games list editor
+
 Ctrl+D - shows\hides debug panel
+
 Ctrl+S - saves all
+
 SPACE - rolls baraban
+
 Ctrl+M - music ON/OFF
+
 Game list saves to [UserName]\Documents\Randomizer\games.txt
+
 Some options in [UserName]\Documents\Randomizer\options.ini
+
 
