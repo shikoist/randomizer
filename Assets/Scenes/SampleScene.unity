@@ -124,7 +124,7 @@ GameObject:
   - component: {fileID: 20735246}
   - component: {fileID: 20735245}
   m_Layer: 5
-  m_Name: Panel
+  m_Name: Debug
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -677,19 +677,21 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: '<b>RANDOMIZER</b> by <b>shikoist</b>
 
-    <b><i>F1</i></b> - shows\hides this panel
+    <b><i>Ctrl+H</i></b> - shows\hides this panel
 
-    <b><i>F2</i></b> - shows\hides games list editor
+    <b><i>Ctrl+L</i></b> - shows\hides games list editor
 
-    <b><i>F3</i></b> - shows\hides debug panel
+    <b><i>Ctrl+D</i></b> - shows\hides debug panel
 
-    <b><i>F4</i></b> - saves list
+    <b><i>Ctrl+S</i></b> - saves list
 
     <b><i>SPACE</i></b> - rolls baraban
 
-    <b><i>M</i></b> - music ON/OFF
+    <b><i>Ctrl+M</i></b> - music ON/OFF
 
     Game list saves to [UserName]\Documents\Randomizer\games.txt
+
+    Some options in [UserName]\Documents\Randomizer\options.ini
 
     This is Public Domain project, source here: https://github.com/shikoist/randomizer'
 --- !u!222 &947067721
@@ -1283,7 +1285,7 @@ GameObject:
   - component: {fileID: 2096962558}
   - component: {fileID: 2096962557}
   m_Layer: 5
-  m_Name: InputField
+  m_Name: ListOfGames
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

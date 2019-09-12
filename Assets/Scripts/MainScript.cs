@@ -205,73 +205,80 @@ public class MainScript : MonoBehaviour {
 
         UpdateDebug(baraban.rotation.eulerAngles.y, bVelocity, randVelocity, decVelocity);
 
-        if (Input.GetKeyDown(KeyCode.F2))
+        if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
         {
-            Debug.Log("F2 pressed");
 
-            // Выключается список игр
-            if (listGO.activeSelf)
+            // Редактор списка игр
+            if (Input.GetKeyDown(KeyCode.L))
             {
-                listGO.SetActive(false);
-                OnListChanged();
+                Debug.Log("F2 pressed");
+
+                // Выключается список игр
+                if (listGO.activeSelf)
+                {
+                    listGO.SetActive(false);
+                    OnListChanged();
+                }
+                // Включается список игр
+                else
+                {
+                    listGO.SetActive(true);
+                    inputField.Select();
+                }
             }
-            // Включается список игр
-            else
+
+            // Окно дебага
+            if (Input.GetKeyDown(KeyCode.D))
             {
-                listGO.SetActive(true);
-                inputField.Select();
+                // Выключается
+                if (debugPanel.gameObject.activeSelf)
+                {
+                    debugPanel.gameObject.SetActive(false);
+
+                }
+                // Включается
+                else
+                {
+                    debugPanel.gameObject.SetActive(true);
+
+                }
+            }
+
+            if (Input.GetKeyDown(KeyCode.M))
+            {
+                if (audioPlayer.isPlaying)
+                {
+                    audioPlayer.Stop();
+                }
+                else
+                {
+                    audioPlayer.Play();
+                }
+            }
+
+            // Справочная панель
+            if (Input.GetKeyDown(KeyCode.H))
+            {
+                // Выключается справочная панель
+                if (helpPanel.gameObject.activeSelf)
+                {
+                    helpPanel.gameObject.SetActive(false);
+
+                }
+                // Включается справочная панель
+                else
+                {
+                    helpPanel.gameObject.SetActive(true);
+
+                }
+            }
+
+            // Сохранить всё
+            if (Input.GetKeyDown(KeyCode.S))
+            {
+                SaveAll();
             }
         }
-
-        if (Input.GetKeyDown(KeyCode.F3))
-        {
-            // Выключается список игр
-            if (debugPanel.gameObject.activeSelf)
-            {
-                debugPanel.gameObject.SetActive(false);
-                
-            }
-            // Включается список игр
-            else
-            {
-                debugPanel.gameObject.SetActive(true);
-                
-            }
-        }
-
-        if (Input.GetKeyDown(KeyCode.M))
-        {
-            if (audioPlayer.isPlaying)
-            {
-                audioPlayer.Stop();
-            }
-            else
-            {
-                audioPlayer.Play();
-            }
-        }
-
-        if (Input.GetKeyDown(KeyCode.F1))
-        {
-            // Выключается список игр
-            if (helpPanel.gameObject.activeSelf)
-            {
-                helpPanel.gameObject.SetActive(false);
-
-            }
-            // Включается список игр
-            else
-            {
-                helpPanel.gameObject.SetActive(true);
-
-            }
-        }
-
-        if (Input.GetKeyDown(KeyCode.F4))
-        {
-            SaveAll();
-        }
-
 
 
         if (Input.GetKeyDown(KeyCode.Space) && isRolled == false && !listGO.activeSelf)
