@@ -10,7 +10,7 @@ public class MainScript : MonoBehaviour {
 
     public Transform baraban;
 
-    //public Text listText;
+    // Здесь хранится список игр строкой с переносами
     public InputField inputField;
 
     public Transform prefabText;
@@ -30,7 +30,6 @@ public class MainScript : MonoBehaviour {
 
     string fullPath = "";
     string pathToList = "";
-    //string helpOff = "";
     string optionsFile = "";
     string pathToWinnersList = "";
 
@@ -45,6 +44,9 @@ public class MainScript : MonoBehaviour {
     public float decMinVelocity = 4;
     public float decMaxVelocity = 7;
 
+    public float blinkingTime = 5;
+
+    // Дополнительная строка, содержащая только победителей
     string winnersList = "";
 
     // Use this for initialization
@@ -64,16 +66,11 @@ public class MainScript : MonoBehaviour {
             System.IO.Directory.CreateDirectory(fullPath);
         }
 
-        //if (System.IO.File.Exists(helpOff))
         if (System.IO.File.Exists(optionsFile))
         {
             helpPanel.gameObject.SetActive(false);
         }
-        //else
-        //{
-        //    System.IO.File.WriteAllText(helpOff, "help off");
-        //}
-
+        
         // Сохраняем или загружаем список игр, если он уже есть
         CreateOrReadFileGames();
 
@@ -97,8 +94,6 @@ public class MainScript : MonoBehaviour {
         }
         else
         {
-            //listText.text = System.IO.File.ReadAllText(pathToList);
-            //Debug.Log(listText.text);
             inputField.text = System.IO.File.ReadAllText(pathToList);
             Debug.Log(inputField.text);
         }
@@ -112,7 +107,8 @@ public class MainScript : MonoBehaviour {
             "startMinVelocity " + startMinVelocity + "\n" +
             "startMMaxVelocity " + startMaxVelocity + "\n" + 
             "decMinVelocity " + decMinVelocity + "\n" +
-            "decMaxVelocity " + decMaxVelocity + "\n";
+            "decMaxVelocity " + decMaxVelocity + "\n" +
+            "blinkingTime " + blinkingTime + "\n";
         return optionsStr;
     }
 
@@ -152,6 +148,9 @@ public class MainScript : MonoBehaviour {
 
             strText2 = strText[4].Split(' ');
             decMaxVelocity = int.Parse(strText2[1]);
+
+            strText2 = strText[5].Split(' ');
+            blinkingTime = int.Parse(strText2[1]);
         }
     }
 
@@ -194,6 +193,15 @@ public class MainScript : MonoBehaviour {
         return rtn;
     }
 
+    void AddStar(string winner)
+    {
+        // Здесь нужно удалить из текста inputField выигравшую игру
+        MainScript ms = GameObject.FindObjectOfType<MainScript>();
+
+        int findWinnerInList = ms.inputField.text.IndexOf(winner);
+        ms.inputField.text = ms.inputField.text.Insert(findWinnerInList, "*");
+    }
+
     public void SaveAll()
     {
         System.IO.File.WriteAllText(pathToList, inputField.text);
@@ -203,7 +211,7 @@ public class MainScript : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-        UpdateDebug(baraban.rotation.eulerAngles.y, bVelocity, randVelocity, decVelocity);
+        UpdateDebug(baraban.rotation.eulerAngles.y, bVelocity, randVelocity, decVelocity, QualitySettings.vSyncCount);
 
         if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
         {
@@ -211,7 +219,7 @@ public class MainScript : MonoBehaviour {
             // Редактор списка игр
             if (Input.GetKeyDown(KeyCode.L))
             {
-                Debug.Log("F2 pressed");
+                Debug.Log("Gamelist opened");
 
                 // Выключается список игр
                 if (listGO.activeSelf)
@@ -278,6 +286,15 @@ public class MainScript : MonoBehaviour {
             {
                 SaveAll();
             }
+
+            // Вертикальная синхронизация
+            if (Input.GetKeyDown(KeyCode.V))
+            {
+                if (QualitySettings.vSyncCount == 4)
+                    QualitySettings.vSyncCount = 0;
+                else
+                    QualitySettings.vSyncCount++;
+            }
         }
 
 
@@ -296,13 +313,7 @@ public class MainScript : MonoBehaviour {
         {
             isRolled = false;
 
-            // Здесь нужно дать понять, какой вариант выиграл
-            // Для этого текущий угол барабана делим на 360.
-
             CalculateWinner();
-
-            //float winner = baraban.rotation.eulerAngles.y / 360.0f;
-            //Debug.Log("Winner : " + winner);
         }
 	}
 
@@ -323,6 +334,7 @@ public class MainScript : MonoBehaviour {
             }
         }
 
+        // Список расстояний до стрелки карточек, оставшихся справа
         List<float> distances = new List<float>();
 
         for (int i = 0; i < winners.Count; i++)
@@ -330,8 +342,8 @@ public class MainScript : MonoBehaviour {
             distances.Add(Mathf.Abs(winners[i].transform.position.z));
         }
 
+        // Последовательно уменьшаем расстояние, чтобы узнать самое маленькое
         float minValue = Mathf.Infinity;
-
         for (int i = 0; i < winners.Count; i++)
         {
             if (distances[i] < minValue)
@@ -340,37 +352,34 @@ public class MainScript : MonoBehaviour {
             }
         }
 
-        // Вычисляем, у кого минималка
+        // Вычисляем, у кого именно минимальное расстояние до стрелки
         for (int i = 0; i < winners.Count; i++)
         {
+            // Номер i наш победитель
             if (minValue == distances[i])
             {
-                // номер i наш победитель
+                // Добавляем мигание
                 winners[i].AddComponent<Blinking>();
+                winners[i].GetComponent<Blinking>().endTime = Time.time + blinkingTime;
 
+                // Добавляем в список победителей
                 winnersList += winners[i].GetComponent<TextMesh>().text + " at time " + System.DateTime.Now + "\n";
 
+                // Записать в файл победителей
                 System.IO.File.WriteAllText(pathToWinnersList, winnersList);
 
-                //// Вставляем звёздочку перед именем выигравшей карточки
-                //int findWinnerInList = inputField.text.IndexOf(winners[i].GetComponent<TextMesh>().text);
-                //inputField.text = inputField.text.Insert(findWinnerInList, "***");
-                //inputField.text = inputField.text.Insert(findWinnerInList + winners[i].GetComponent<TextMesh>().text.Length + 2, "***");
-                //Debug.Log("findWinner : " + findWinnerInList);
+                // Вставляем звёздочку перед именем выигравшей карточки
+                AddStar(winners[i].GetComponent<TextMesh>().text);
 
-                //// И всё сохраняем.
-                //SaveAll();
-
-                //winners[i].GetComponent<TextMesh>().text = "*" + winners[i].GetComponent<TextMesh>().text;
-                //SaveAll();
-
+                // Выводим значения в лог
                 Debug.Log("winner is " + winners[i].GetComponent<TextMesh>().text + " : minValue = " + minValue);
-
-
                 for (int j = 0; j < winners.Count; j++)
                 {
                     Debug.Log("winners[" + j + "] " + winners[j].GetComponent<TextMesh>().text + " : minValue = " + distances[j]);
                 }
+
+                // Выходим из цикла, потому что победитель найден
+                break;
             }
         }
     }
@@ -382,31 +391,40 @@ public class MainScript : MonoBehaviour {
 
     public void OnListChanged()
     {
-        // Удаление предыдущих объектов
-        ClearGames();
-
-        baraban.localRotation = Quaternion.identity;
-
-        // Парсится список игр
-        string[] strText;
-        strText = inputField.text.Split('\n');
-
-        List<string> fltrGames = new List<string>();
-
-        for (int i = 0; i < strText.Length; i++)
+        if (!isRolled)
         {
-            if (strText[i].Length < 3 || strText[i][0] == '*') continue;
-            fltrGames.Add(strText[i]);
-        }
+            // Удаление предыдущих объектов
+            ClearGames();
 
-        for (int i = 0; i < fltrGames.Count; i++)
-        {
-            Debug.Log(i + " : " + fltrGames[i]);
-            
-            GameObject go = CreateGame(fltrGames[i], i, fltrGames.Count);
-        }
+            baraban.localRotation = Quaternion.identity;
 
-        baraban.rotation = Quaternion.Euler(0, Random.Range(0.0f, 360.0f), 0.0f);
+            // Парсится список игр
+            string[] strText;
+
+            // Разбиваем на строки
+            strText = inputField.text.Split('\n');
+
+            // Создаём более удобный список игр в виде объектов листа, 
+            // чтобы точно знать общее количество
+            List<string> fltrGames = new List<string>();
+
+            for (int i = 0; i < strText.Length; i++)
+            {
+                // Убираем игры со звёздочкой
+                if (strText[i].Length < 3 || strText[i][0] == '*') continue;
+                fltrGames.Add(strText[i]);
+            }
+
+            // Создаём карточки с играми на барабане
+            for (int i = 0; i < fltrGames.Count; i++)
+            {
+                Debug.Log(i + " : " + fltrGames[i]);
+                GameObject go = CreateGame(fltrGames[i], i, fltrGames.Count);
+            }
+
+            // Задаём случайное вращение барабану
+            baraban.rotation = Quaternion.Euler(0, Random.Range(0.0f, 360.0f), 0.0f);
+        }
     }
 
     void ClearGames()
@@ -418,7 +436,7 @@ public class MainScript : MonoBehaviour {
         }
     }
 
-    // Создаём картонку с игрой
+    // Создаём карточку с игрой
     GameObject CreateGame(string strGame, int n, int all)
     {
         Transform go = (Transform)Instantiate(prefabText);
@@ -431,14 +449,8 @@ public class MainScript : MonoBehaviour {
         float z = r * Mathf.Sin(a * Mathf.Deg2Rad);
 
         go.SetParent(baraban);
-
         go.localPosition = new Vector3(x, 2.01f + n * 0.001f, z);
-        //go.localPosition = Vector3.zero + Vector3.up * 2 + Vector3.right * 1.68f;
-        //go.Translate(Vector3.up * 2);
-        //go.Translate(Vector3.right * 0.68f);
         go.Rotate(Vector3.up, 360 - a, Space.World);
-        
-        
 
         return go.gameObject;
     }
@@ -451,10 +463,11 @@ public class MainScript : MonoBehaviour {
         decVelocity = Random.Range(decMinVelocity, decMaxVelocity);
     }
 
-    void UpdateDebug(float bAngle, float bVelocity, float startVelocity, float decVelocity)
+    void UpdateDebug(float bAngle, float bVelocity, float startVelocity, float decVelocity, int vsync)
     {
         debugText.text = "Baraban Angle : " + bAngle + "\n" + "Baraban Velocity : " + bVelocity + "\n" + "Start Velocity : " + startVelocity + "\n" + 
             "Decrease Velocity : " + decVelocity + "\n" +
-            "Frames per second: " + (1.0f / Time.deltaTime).ToString();
+            "Frames per second: " + (1.0f / Time.deltaTime).ToString() + "\n" +
+            "VSync mode (0 = off): " + vsync;
     }
 }

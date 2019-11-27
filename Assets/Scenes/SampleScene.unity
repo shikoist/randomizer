@@ -129,7 +129,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &20735244
 RectTransform:
   m_ObjectHideFlags: 0
@@ -147,7 +147,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: -10, y: -10}
-  m_SizeDelta: {x: 300, y: 100}
+  m_SizeDelta: {x: 300, y: 200}
   m_Pivot: {x: 1, y: 1}
 --- !u!114 &20735245
 MonoBehaviour:
@@ -572,7 +572,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: -10}
-  m_SizeDelta: {x: 350, y: 180}
+  m_SizeDelta: {x: 350, y: 320}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &718339192
 MonoBehaviour:
@@ -641,7 +641,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 350, y: 180}
+  m_SizeDelta: {x: 350, y: 320}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &947067720
 MonoBehaviour:
@@ -677,6 +677,7 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: '<b>RANDOMIZER</b> by <b>shikoist</b>
 
+
     <b><i>Ctrl+H</i></b> - shows\hides this panel
 
     <b><i>Ctrl+L</i></b> - shows\hides games list editor
@@ -688,6 +689,8 @@ MonoBehaviour:
     <b><i>SPACE</i></b> - rolls baraban
 
     <b><i>Ctrl+M</i></b> - music ON/OFF
+
+    <b><i>Ctrl+V</i></b> - select vSync mode
 
     Game list saves to [UserName]\Documents\Randomizer\games.txt
 
