@@ -16,6 +16,7 @@ public class MainScript : MonoBehaviour {
     public Transform prefabText;
 
     public bool isRolled = false;
+    public bool isBlinking = false;
 
     public float randVelocity;
     public float bVelocity;
@@ -53,7 +54,7 @@ public class MainScript : MonoBehaviour {
     void Start () {
 
         userDocumentsPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments);
-        Debug.Log(userDocumentsPath);
+        //Debug.Log(userDocumentsPath);
         fullPath = userDocumentsPath + "\\Randomizer";
         pathToList = fullPath + "\\games.txt";
         //helpOff = fullPath + "\\help_off.txt";
@@ -79,7 +80,7 @@ public class MainScript : MonoBehaviour {
 
         // Применяем цвет пола
         Renderer rr = floor.GetComponent<Renderer>();
-        Debug.Log(ToHex(rr.material.color));
+        //Debug.Log(ToHex(rr.material.color));
         rr.material.color = colorFloor;
 
         listGO.SetActive(false);
@@ -95,10 +96,10 @@ public class MainScript : MonoBehaviour {
         else
         {
             inputField.text = System.IO.File.ReadAllText(pathToList);
-            Debug.Log(inputField.text);
+            //Debug.Log(inputField.text);
         }
 
-        OnListChanged();
+        ResetBaraban();
     }
 
     string CurrentOptions()
@@ -121,7 +122,7 @@ public class MainScript : MonoBehaviour {
         else
         {
             string inputText = System.IO.File.ReadAllText(optionsFile);
-            Debug.Log("Options file : " + inputText);
+            //Debug.Log("Options file : " + inputText);
 
             // Парсится и применяется список настроек
             string[] strText;
@@ -132,7 +133,7 @@ public class MainScript : MonoBehaviour {
             // Разбиваем на подстроки с переменными
             string[] strText2 = strText[0].Split(' ');
 
-            Debug.Log("Read color : " + strText2[1]);
+            //Debug.Log("Read color : " + strText2[1]);
             colorFloor = FromHex(strText2[1]);
 
             // Чтение минимальной скорости
@@ -172,7 +173,7 @@ public class MainScript : MonoBehaviour {
 
         if (hex.Length != 6)
         {
-            Debug.Log("Color not valid " + hex.Length);
+            //Debug.Log("Color not valid " + hex.Length);
             return Color.white;
         }
 
@@ -181,14 +182,14 @@ public class MainScript : MonoBehaviour {
         g = int.Parse(hex.Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
         b = int.Parse(hex.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
 
-        Debug.Log("FromHex : " + r + " " + g + " " + b);
+        //Debug.Log("FromHex : " + r + " " + g + " " + b);
 
         Color rtn = new Color(
              r / 255.0f,
              g / 255.0f,
              b / 255.0f);
 
-        Debug.Log(rtn);
+        //Debug.Log(rtn);
 
         return rtn;
     }
@@ -219,13 +220,13 @@ public class MainScript : MonoBehaviour {
             // Редактор списка игр
             if (Input.GetKeyDown(KeyCode.L))
             {
-                Debug.Log("Gamelist opened");
+                //Debug.Log("Gamelist opened");
 
                 // Выключается список игр
                 if (listGO.activeSelf)
                 {
                     listGO.SetActive(false);
-                    OnListChanged();
+                    ResetBaraban();
                 }
                 // Включается список игр
                 else
@@ -298,7 +299,7 @@ public class MainScript : MonoBehaviour {
         }
 
 
-        if (Input.GetKeyDown(KeyCode.Space) && isRolled == false && !listGO.activeSelf)
+        if (Input.GetKeyDown(KeyCode.Space) && isRolled == false && isBlinking == false && !listGO.activeSelf)
         {
             RollBaraban();
         }
@@ -309,10 +310,19 @@ public class MainScript : MonoBehaviour {
             bVelocity -= decVelocity * Time.deltaTime;
         }
 
+        if (Input.GetKeyDown(KeyCode.Space) && isBlinking)
+        {
+            GameObject blinkingGame = GameObject.FindObjectOfType<Blinking>().gameObject;
+            Blinking b = blinkingGame.GetComponent<Blinking>();
+            b.ExitBlinking();
+            isBlinking = false;
+            ResetBaraban();
+        }
+
         if (bVelocity < 1.0f && isRolled)
         {
             isRolled = false;
-
+            Debug.Log("Baraban stopped rolling. calculate winner");
             CalculateWinner();
         }
 	}
@@ -321,34 +331,42 @@ public class MainScript : MonoBehaviour {
     {
         // Z-позиция выигрывшей таблички ближе всего к 0.0, при этом X-позиция положительна
 
-        List<GameObject> winners = new List<GameObject>();
-
         GameObject[] goList = GameObject.FindGameObjectsWithTag("Game");
+        List<GameObject> winners = new List<GameObject>();
 
         // Отсеиваем тех, кто левее центра барабана
         for (int i = 0; i < goList.Length; i++)
         {
-            if (goList[i].transform.position.x > 0)
-            {
+        //    if (goList[i].transform.position.x > 0)
+        //    {
                 winners.Add(goList[i]);
-            }
+                //Debug.Log(goList[i]);
+        //    }
         }
 
         // Список расстояний до стрелки карточек, оставшихся справа
-        List<float> distances = new List<float>();
+        //List<float> distances = new List<float>();
+
+        //Список углов карточек
+        List<float> angles = new List<float>();
 
         for (int i = 0; i < winners.Count; i++)
         {
-            distances.Add(Mathf.Abs(winners[i].transform.position.z));
+            //distances.Add(Mathf.Abs(winners[i].transform.position.z));
+            float a = winners[i].transform.rotation.eulerAngles.y;
+            if (a > 180) a = 360 - a;
+            angles.Add(a);
+            //Debug.Log(winners[i].name + " : angle " + a.ToString());
         }
 
         // Последовательно уменьшаем расстояние, чтобы узнать самое маленькое
         float minValue = Mathf.Infinity;
         for (int i = 0; i < winners.Count; i++)
         {
-            if (distances[i] < minValue)
+            //if (distances[i] < minValue)
+            if (angles[i] < minValue)
             {
-                minValue = distances[i];
+                minValue = Mathf.Abs(angles[i]);
             }
         }
 
@@ -356,26 +374,28 @@ public class MainScript : MonoBehaviour {
         for (int i = 0; i < winners.Count; i++)
         {
             // Номер i наш победитель
-            if (minValue == distances[i])
+            if (minValue == angles[i])
             {
                 // Добавляем мигание
                 winners[i].AddComponent<Blinking>();
-                winners[i].GetComponent<Blinking>().endTime = Time.time + blinkingTime;
+                isBlinking = true;
+                //winners[i].GetComponent<Blinking>().endTime = Time.time + blinkingTime;
 
                 // Добавляем в список победителей
-                winnersList += winners[i].GetComponent<TextMesh>().text + " at time " + System.DateTime.Now + "\n";
+                winnersList += winners[i].name + " at time " + System.DateTime.Now + "\n";
+
+                // Вставляем звёздочку перед именем выигравшей карточки
+                AddStar(winners[i].name);
 
                 // Записать в файл победителей
                 System.IO.File.WriteAllText(pathToWinnersList, winnersList);
 
-                // Вставляем звёздочку перед именем выигравшей карточки
-                AddStar(winners[i].GetComponent<TextMesh>().text);
-
                 // Выводим значения в лог
-                Debug.Log("winner is " + winners[i].GetComponent<TextMesh>().text + " : minValue = " + minValue);
+                Debug.Log("winner is " + winners[i].name + " : minValue = " + minValue);
+
                 for (int j = 0; j < winners.Count; j++)
                 {
-                    Debug.Log("winners[" + j + "] " + winners[j].GetComponent<TextMesh>().text + " : minValue = " + distances[j]);
+                    Debug.Log(winners[j].name + " : angle = " + angles[j]);
                 }
 
                 // Выходим из цикла, потому что победитель найден
@@ -389,7 +409,7 @@ public class MainScript : MonoBehaviour {
         SaveAll();
     }
 
-    public void OnListChanged()
+    public void ResetBaraban()
     {
         if (!isRolled)
         {
@@ -418,7 +438,7 @@ public class MainScript : MonoBehaviour {
             // Создаём карточки с играми на барабане
             for (int i = 0; i < fltrGames.Count; i++)
             {
-                Debug.Log(i + " : " + fltrGames[i]);
+                //Debug.Log(i + " : " + fltrGames[i]);
                 GameObject go = CreateGame(fltrGames[i], i, fltrGames.Count);
             }
 
@@ -436,21 +456,34 @@ public class MainScript : MonoBehaviour {
         }
     }
 
-    // Создаём карточку с игрой
+    // Создаём карточку с игрой, n - номер игры, all - всего игр
     GameObject CreateGame(string strGame, int n, int all)
     {
         Transform go = (Transform)Instantiate(prefabText);
-        TextMesh tm = go.GetComponent<TextMesh>();
-        tm.text = strGame;
+        //TextMesh tm = go.GetComponentInChildren<TextMesh>();
+        //if (tm != null)
+        //    tm.text = strGame;
 
-        float a = 360.0f / all * n;
-        float r = 1.4f;
-        float x = r * Mathf.Cos(a * Mathf.Deg2Rad);
-        float z = r * Mathf.Sin(a * Mathf.Deg2Rad);
+        Text text = go.GetComponentInChildren<Text>();
+        text.text = strGame;
+
+        go.name = strGame;
+
+        //float a = 360.0f / all * n;
+        float a = 360.0f / all;
+        //float r = 0.4f;
+        //float x = r * Mathf.Cos(a * Mathf.Deg2Rad);
+        //float z = r * Mathf.Sin(a * Mathf.Deg2Rad);
+
+        //0.4 расстояние от центра
+        //2 расстояние от пола
+        //0.12 расстояние от горизонтали, потому что сама карточка 0,24 м в высоту
+        go.position = new Vector3(0.4f, 2.0f, 0.12f);
 
         go.SetParent(baraban);
-        go.localPosition = new Vector3(x, 2.01f + n * 0.001f, z);
-        go.Rotate(Vector3.up, 360 - a, Space.World);
+        baraban.Rotate(Vector3.up, a, Space.World);
+        //go.localPosition = new Vector3(x, 2.01f + n * 0.001f, z);
+        //go.Rotate(Vector3.up, 380 - a, Space.World);
 
         return go.gameObject;
     }
