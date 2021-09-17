@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class MainScript : MonoBehaviour {
 
@@ -11,7 +12,7 @@ public class MainScript : MonoBehaviour {
     public Transform baraban;
 
     // Здесь хранится список игр строкой с переносами
-    public InputField inputField;
+    public TMP_InputField inputField;
 
     public Transform prefabText;
 
@@ -82,6 +83,11 @@ public class MainScript : MonoBehaviour {
         Renderer rr = floor.GetComponent<Renderer>();
         //Debug.Log(ToHex(rr.material.color));
         rr.material.color = colorFloor;
+
+        // Почему-то не сохраняется опция wrapping в компоненте Text,
+        // который хранит игры
+        TMP_Text tt = listGO.GetComponentsInChildren<TMP_Text>()[1];
+        tt.enableWordWrapping = false;
 
         listGO.SetActive(false);
         debugPanel.gameObject.SetActive(false);
@@ -233,6 +239,9 @@ public class MainScript : MonoBehaviour {
                 {
                     listGO.SetActive(true);
                     inputField.Select();
+                    ResetBaraban();
+                    bVelocity = 0;
+                    isRolled = false;
                 }
             }
 
@@ -243,13 +252,11 @@ public class MainScript : MonoBehaviour {
                 if (debugPanel.gameObject.activeSelf)
                 {
                     debugPanel.gameObject.SetActive(false);
-
                 }
                 // Включается
                 else
                 {
                     debugPanel.gameObject.SetActive(true);
-
                 }
             }
 
@@ -278,7 +285,6 @@ public class MainScript : MonoBehaviour {
                 else
                 {
                     helpPanel.gameObject.SetActive(true);
-
                 }
             }
 
@@ -354,7 +360,18 @@ public class MainScript : MonoBehaviour {
         {
             //distances.Add(Mathf.Abs(winners[i].transform.position.z));
             float a = winners[i].transform.rotation.eulerAngles.y;
+
+            // Поскольку углы у карточек считаются от 0 до 360,
+            // то при этом карточки, находящиеся ближе к 360,
+            // визуально находятся чуть выше стрелки. Их тоже надо учитывать,
+            // если они ближе к стрелке, чем нижние.
+            // Карточки, имеющие угол около 180, визуально лежат на другой
+            // стороне от барабана.
+            // Поэтому отняв от 360 градусов угол карточки,
+            // мы как бы перекладываем их вниз, и они теперь тоже
+            // учитываются.
             if (a > 180) a = 360 - a;
+
             angles.Add(a);
             //Debug.Log(winners[i].name + " : angle " + a.ToString());
         }
@@ -409,6 +426,8 @@ public class MainScript : MonoBehaviour {
         SaveAll();
     }
 
+    // В этой функции мы раскладываем карточки, 
+    // имея список игр в строке inputField
     public void ResetBaraban()
     {
         if (!isRolled)
@@ -416,6 +435,7 @@ public class MainScript : MonoBehaviour {
             // Удаление предыдущих объектов
             ClearGames();
 
+            // Сбрасываем поворот модели барабана в ноль
             baraban.localRotation = Quaternion.identity;
 
             // Парсится список игр
@@ -428,11 +448,22 @@ public class MainScript : MonoBehaviour {
             // чтобы точно знать общее количество
             List<string> fltrGames = new List<string>();
 
+            // Убираем игры со звёздочкой, переносим их в новый список
             for (int i = 0; i < strText.Length; i++)
             {
-                // Убираем игры со звёздочкой
                 if (strText[i].Length < 3 || strText[i][0] == '*') continue;
                 fltrGames.Add(strText[i]);
+            }
+
+            // Перемешиваем карточки
+            for (int i = 0; i < fltrGames.Count; i++)
+            {
+                string tmp = "";
+                int rnd = Random.Range(0, fltrGames.Count);
+
+                tmp = fltrGames[i];
+                fltrGames[i] = fltrGames[rnd];
+                fltrGames[rnd] = tmp;
             }
 
             // Создаём карточки с играми на барабане
@@ -460,20 +491,13 @@ public class MainScript : MonoBehaviour {
     GameObject CreateGame(string strGame, int n, int all)
     {
         Transform go = (Transform)Instantiate(prefabText);
-        //TextMesh tm = go.GetComponentInChildren<TextMesh>();
-        //if (tm != null)
-        //    tm.text = strGame;
 
+        // Меняем текст в карточке на название игры из параметра функции
         Text text = go.GetComponentInChildren<Text>();
         text.text = strGame;
 
+        // Переименовываем сам объект для удобства
         go.name = strGame;
-
-        //float a = 360.0f / all * n;
-        float a = 360.0f / all;
-        //float r = 0.4f;
-        //float x = r * Mathf.Cos(a * Mathf.Deg2Rad);
-        //float z = r * Mathf.Sin(a * Mathf.Deg2Rad);
 
         //0.4 расстояние от центра
         //2 расстояние от пола
@@ -481,10 +505,12 @@ public class MainScript : MonoBehaviour {
         go.position = new Vector3(0.4f, 2.0f, 0.12f);
 
         go.SetParent(baraban);
-        baraban.Rotate(Vector3.up, a, Space.World);
-        //go.localPosition = new Vector3(x, 2.01f + n * 0.001f, z);
-        //go.Rotate(Vector3.up, 380 - a, Space.World);
 
+        // Угол, на который мы поворачиваем барабан перед прикреплением
+        // следующей карточки, равен 360, поделённому на количество игр
+        float a = 360.0f / all;
+        baraban.Rotate(Vector3.up, a, Space.World);
+        
         return go.gameObject;
     }
 
