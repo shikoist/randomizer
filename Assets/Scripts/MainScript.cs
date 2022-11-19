@@ -7,6 +7,8 @@ using TMPro;
 
 public class MainScript : MonoBehaviour {
 
+    int currentCamPos = 0;
+
     public GameObject listGO;
 
     public Transform baraban;
@@ -34,6 +36,7 @@ public class MainScript : MonoBehaviour {
     string pathToList = "";
     string optionsFile = "";
     string pathToWinnersList = "";
+    string musicFile = "";
 
     public AudioSource audioPlayer;
 
@@ -56,11 +59,16 @@ public class MainScript : MonoBehaviour {
 
         userDocumentsPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments);
         //Debug.Log(userDocumentsPath);
-        fullPath = userDocumentsPath + "\\Randomizer";
-        pathToList = fullPath + "\\games.txt";
-        //helpOff = fullPath + "\\help_off.txt";
-        optionsFile = fullPath + "\\options.ini";
-        pathToWinnersList = fullPath + "\\winners.txt";
+        fullPath = userDocumentsPath + "\\Randomizer\\";
+        pathToList = fullPath + "games.txt";
+        //helpOff = fullPath + "help_off.txt";
+        optionsFile = fullPath + "options.ini";
+        pathToWinnersList = fullPath + "winners.txt";
+        musicFile = fullPath + "music.ogg";
+
+        Debug.Log(fullPath);
+
+        
 
         // Создаём директорию в документах пользователя, как все приличные приложения
         if (!System.IO.Directory.Exists(fullPath))
@@ -68,10 +76,10 @@ public class MainScript : MonoBehaviour {
             System.IO.Directory.CreateDirectory(fullPath);
         }
 
-        if (System.IO.File.Exists(optionsFile))
+        /*if (System.IO.File.Exists(optionsFile))
         {
             helpPanel.gameObject.SetActive(false);
-        }
+        }*/
         
         // Сохраняем или загружаем список игр, если он уже есть
         CreateOrReadFileGames();
@@ -91,7 +99,17 @@ public class MainScript : MonoBehaviour {
 
         listGO.SetActive(false);
         debugPanel.gameObject.SetActive(false);
-	}
+
+        Music music = FindObjectOfType<Music>();
+        if (music == null)
+        {
+            Debug.Log("Object Music not found");
+        }
+        else
+        {
+            music.Load(musicFile);
+        }
+    }
 
     void CreateOrReadFileGames()
     {
@@ -220,9 +238,90 @@ public class MainScript : MonoBehaviour {
 
         UpdateDebug(baraban.rotation.eulerAngles.y, bVelocity, randVelocity, decVelocity, QualitySettings.vSyncCount);
 
+
+
+        // Окно дебага
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            // Выключается
+            if (debugPanel.gameObject.activeSelf)
+            {
+                debugPanel.gameObject.SetActive(false);
+            }
+            // Включается
+            else
+            {
+                debugPanel.gameObject.SetActive(true);
+            }
+        }
+
+        //Music ON OFF
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            if (audioPlayer.isPlaying)
+            {
+                audioPlayer.Stop();
+            }
+            else
+            {
+                audioPlayer.Play();
+            }
+        }
+
+        //Поменять положение камеры, чтобы осмотреть весь барабан, например
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            Vector3[] camPos = {
+                new Vector3(1.5f, 4, 0),
+                new Vector3(0, 6.8f, 0)
+            };
+            currentCamPos++;
+
+            if (currentCamPos >= camPos.Length)
+            {
+                currentCamPos = 0;
+            }
+
+            Camera cam = FindObjectOfType<Camera>();
+            cam.transform.position = camPos[currentCamPos];
+        }
+
+        // Справочная панель
+        if (Input.GetKeyDown(KeyCode.H) || Input.GetKeyDown(KeyCode.F1))
+        {
+            // Выключается справочная панель
+            if (helpPanel.gameObject.activeSelf)
+            {
+                helpPanel.gameObject.SetActive(false);
+            }
+            // Включается справочная панель
+            else
+            {
+                helpPanel.gameObject.SetActive(true);
+            }
+        }
+
+
+
+        // Вертикальная синхронизация
+        /*if (Input.GetKeyDown(KeyCode.V))
+        {
+            if (QualitySettings.vSyncCount == 4)
+                QualitySettings.vSyncCount = 0;
+            else
+                QualitySettings.vSyncCount++;
+        }*/
+
         if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
         {
+            // Сохранить всё
+            if (Input.GetKeyDown(KeyCode.S))
+            {
+                SaveAll();
+            }
 
+            // Был баг, когда при выключении списка игр буква l добавлялась случайным образом
+            // Это потому что открытый список ловил эту кнопку, когда выключался
             // Редактор списка игр
             if (Input.GetKeyDown(KeyCode.L))
             {
@@ -245,65 +344,7 @@ public class MainScript : MonoBehaviour {
                 }
             }
 
-            // Окно дебага
-            if (Input.GetKeyDown(KeyCode.D))
-            {
-                // Выключается
-                if (debugPanel.gameObject.activeSelf)
-                {
-                    debugPanel.gameObject.SetActive(false);
-                }
-                // Включается
-                else
-                {
-                    debugPanel.gameObject.SetActive(true);
-                }
-            }
-
-            if (Input.GetKeyDown(KeyCode.M))
-            {
-                if (audioPlayer.isPlaying)
-                {
-                    audioPlayer.Stop();
-                }
-                else
-                {
-                    audioPlayer.Play();
-                }
-            }
-
-            // Справочная панель
-            if (Input.GetKeyDown(KeyCode.H))
-            {
-                // Выключается справочная панель
-                if (helpPanel.gameObject.activeSelf)
-                {
-                    helpPanel.gameObject.SetActive(false);
-
-                }
-                // Включается справочная панель
-                else
-                {
-                    helpPanel.gameObject.SetActive(true);
-                }
-            }
-
-            // Сохранить всё
-            if (Input.GetKeyDown(KeyCode.S))
-            {
-                SaveAll();
-            }
-
-            // Вертикальная синхронизация
-            if (Input.GetKeyDown(KeyCode.V))
-            {
-                if (QualitySettings.vSyncCount == 4)
-                    QualitySettings.vSyncCount = 0;
-                else
-                    QualitySettings.vSyncCount++;
-            }
         }
-
 
         if (Input.GetKeyDown(KeyCode.Space) && isRolled == false && isBlinking == false && !listGO.activeSelf)
         {
@@ -390,13 +431,18 @@ public class MainScript : MonoBehaviour {
         // Вычисляем, у кого именно минимальное расстояние до стрелки
         for (int i = 0; i < winners.Count; i++)
         {
-            // Номер i наш победитель
+            // Номер i наш победитель!
             if (minValue == angles[i])
             {
                 // Добавляем мигание
                 winners[i].AddComponent<Blinking>();
                 isBlinking = true;
                 //winners[i].GetComponent<Blinking>().endTime = Time.time + blinkingTime;
+
+                //Показать карточку прямо перед стрелкой
+                winners[i].transform.SetParent(null);
+                winners[i].transform.position = new Vector3(0.45f, 2.05f, 0.1f);
+                winners[i].transform.rotation = Quaternion.identity;
 
                 // Добавляем в список победителей
                 winnersList += winners[i].name + " at time " + System.DateTime.Now + "\n";
@@ -502,7 +548,7 @@ public class MainScript : MonoBehaviour {
         //0.4 расстояние от центра
         //2 расстояние от пола
         //0.12 расстояние от горизонтали, потому что сама карточка 0,24 м в высоту
-        go.position = new Vector3(0.4f, 2.0f, 0.12f);
+        go.position = new Vector3(0.4f, 2.01f, 0.12f);
 
         go.SetParent(baraban);
 

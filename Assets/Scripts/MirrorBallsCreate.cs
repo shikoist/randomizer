@@ -14,7 +14,7 @@ public class MirrorBallsCreate : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         float a = 360.0f / n;
-        float r = 2.6f;
+        float r = 2.68f;
         float x, z, a1;
         
         for (int i = 0; i < n; i++)

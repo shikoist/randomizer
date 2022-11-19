@@ -227,7 +227,7 @@ MonoBehaviour:
   m_enableKerning: 1
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
-  m_isRichText: 1
+  m_isRichText: 0
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -359,6 +359,7 @@ GameObject:
   m_Component:
   - component: {fileID: 44947423}
   - component: {fileID: 44947422}
+  - component: {fileID: 44947424}
   m_Layer: 0
   m_Name: Audio Source
   m_TagString: Untagged
@@ -373,7 +374,7 @@ AudioSource:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 44947421}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
@@ -476,6 +477,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &44947424
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 44947421}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 551f29e046de28245a9b54184d218ed4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &61779956
 GameObject:
   m_ObjectHideFlags: 0
@@ -1001,7 +1014,7 @@ Camera:
   m_GameObject: {fileID: 534669902}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
+  m_ClearFlags: 2
   m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
@@ -1043,7 +1056,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 534669902}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 1.53, y: 5, z: 0}
+  m_LocalPosition: {x: 1.5, y: 4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1106,7 +1119,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.79607844}
+  m_Color: {r: 0.9433962, g: 0.9433962, b: 0.9433962, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -1147,7 +1160,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &939873212
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1252,12 +1265,12 @@ MonoBehaviour:
       m_Calls: []
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_CustomCaretColor: 0
-  m_SelectionColor: {r: 1, g: 0.1981132, b: 0.30118126, a: 0.7529412}
+  m_SelectionColor: {r: 0.007831988, g: 0.57251835, b: 0.8301887, a: 0.7529412}
   m_Text: 
   m_CaretBlinkRate: 3
   m_CaretWidth: 2
   m_ReadOnly: 0
-  m_RichText: 1
+  m_RichText: 0
   m_GlobalFontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_OnFocusSelectAll: 1
   m_ResetOnDeActivation: 1
@@ -1333,10 +1346,10 @@ RectTransform:
   m_Father: {fileID: 718339191}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 350, y: 320}
+  m_SizeDelta: {x: -22, y: -16}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &947067720
 MonoBehaviour:
@@ -1358,37 +1371,25 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 12
+    m_FontSize: 11
     m_FontStyle: 0
-    m_BestFit: 0
+    m_BestFit: 1
     m_MinSize: 1
-    m_MaxSize: 40
-    m_Alignment: 4
-    m_AlignByGeometry: 0
+    m_MaxSize: 100
+    m_Alignment: 3
+    m_AlignByGeometry: 1
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: '<b>RANDOMIZER</b> by <b>shikoist</b>
-
-
-    <b><i>Ctrl+H</i></b> - shows\hides this panel
-
-    <b><i>Ctrl+L</i></b> - shows\hides games list editor
-
-    <b><i>Ctrl+D</i></b> - shows\hides debug panel
-
-    <b><i>Ctrl+S</i></b> - saves list
-
-    <b><i>SPACE</i></b> - rolls baraban
-
-    <b><i>Ctrl+V</i></b> - select vSync mode
-
-    Game list saves to [UserName]\Documents\Randomizer\games.txt
-
-    Some options in [UserName]\Documents\Randomizer\options.ini
-
-    This is Public Domain project, source here: https://github.com/shikoist/randomizer'
+  m_Text: "<b>RANDOMIZER</b> by <b>shikoist</b>\n\n<b><i>F1 or H</i></b> - show\\hide
+    this panel\n<b><i>\u0421trl + L</i></b> - show\\hide games list editor\n<b><i>Ctrl
+    + S</i></b> - save list\n<b><i>M</i></b> - start\\stop playing music.ogg in user
+    files\n<b><i>D</i></b> - show\\hide debug panel\n<b><i>C</i></b> - change camera
+    position\n<b><i>SPACE</i></b> - roll baraban\n\n<b><i>User Files in Users\\[UserName]\\Documents\\Randomizer\\:</i></b>\n<i>games.txt</i>
+    - list of items\n<i>options.ini</i> - options (color, speed, etc...)\n<i>music.ogg</i>
+    (optional) - you can add your own music.ogg in that directory, it will be played
+    after start\n\nThis is Public Domain project, source here: https://github.com/shikoist/randomizer"
 --- !u!222 &947067721
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1479,7 +1480,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -1937,7 +1938,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 400000, guid: 0b0df33edbeb1854f895ef319afcf8fa, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 2.913
+      value: 2.732
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 0b0df33edbeb1854f895ef319afcf8fa, type: 3}
       propertyPath: m_LocalPosition.y
@@ -1970,6 +1971,10 @@ PrefabInstance:
     - target: {fileID: 400000, guid: 0b0df33edbeb1854f895ef319afcf8fa, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 0b0df33edbeb1854f895ef319afcf8fa, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2300000, guid: 0b0df33edbeb1854f895ef319afcf8fa, type: 3}
       propertyPath: m_Materials.Array.data[0]
